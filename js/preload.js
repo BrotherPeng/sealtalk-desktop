@@ -6,7 +6,7 @@ const platform = {
   OSX: process.platform === 'darwin',
   Windows: process.platform === 'win32'
 }
-var appInfo
+var appInfo, RongIMClientC, configInfo
 
 try {
   appInfo = remote.require('./package.json')
@@ -14,9 +14,27 @@ try {
   appInfo = null
 }
 
+try {
+  configInfo = remote.require('./conf.js')
+  console.log('configInfo', configInfo)
+} catch (err) {
+  configInfo = null
+}
+
+try {
+  RongIMClientC = remote.require('RongIMLib')
+} catch (err) {
+  console.log(err);
+  RongIMClientC = null
+}
+
 window.Electron = {
   ipcRenderer: ipcRenderer,
   appInfo: appInfo,
+  configInfo: configInfo,
+  require: require,
+  remote: remote,
+  addon: RongIMClientC,
   updateBadgeNumber: function (number) {
     // console.log('updateBadgeNumber')
     this.ipcRenderer.send('unread-message-count-changed', number)
@@ -40,9 +58,9 @@ window.Electron = {
     //修改图标
     this.ipcRenderer.send('screenShot')
   },
-  displayBalloon: function (title, message){
+  displayBalloon: function (title, options){
     if (platform.Windows){
-       this.ipcRenderer.send('displayBalloon', title, message)
+       this.ipcRenderer.send('displayBalloon', title, options)
     }
   },
   logRequest: function (){
@@ -82,6 +100,27 @@ window.Electron.ipcRenderer.on('screenshot', () => {
   }
 })
 
+window.Electron.ipcRenderer.on('balloon-click', (event, opt) => {
+  if(typeof(BalloonClick) == "undefined"){
+    console.log('BalloonClick do not exist');
+    return
+  }
+  if (BalloonClick && typeof(eval(BalloonClick)) == "function") {
+    BalloonClick(opt)
+  }
+})
+
+window.Electron.ipcRenderer.on('logout', () => {
+  if(typeof(logout) == "undefined"){
+    console.log('logout do not exist');
+    return
+  }
+  if (logout && typeof(eval(logout)) == "function") {
+    logout()
+  }
+})
+
+// window.Electron.require('electron-cookies')
 /* eslint-disable no-native-reassign, no-undef */
 // Extend and replace the native notifications.
 
@@ -104,10 +143,11 @@ Notification = function (title, options) {
     window.Electron.ipcRenderer.send('notification-click')
   })
   if (platform.Windows){
-    if(checkWin7()){
-      window.Electron.displayBalloon(title, options.body)
+    if(checkWin7() && title && options.body){
+      window.Electron.displayBalloon(title, options)
     }
   }
+
   return notification
 }
 

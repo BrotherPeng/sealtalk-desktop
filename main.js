@@ -1,6 +1,6 @@
 'use strict'
-if (require('electron-squirrel-startup')) return
-
+// 自动更新
+// if (require('electron-squirrel-startup')) return
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
@@ -28,7 +28,8 @@ const platform = {
   Linux: process.platform === 'linux'
 }
 
-const UpdateController = !platform.Linux ? require('./auto-updater') : null
+// 自动更新
+// const UpdateController = !platform.Linux ? require('./auto-updater') : null
 const Utils = require('./utils')
 
 i18n.configure({
@@ -53,6 +54,8 @@ let blink = null
 let updateManager = null
 let isManualClose = false
 let myScreen = null
+// console.log(app.getName())
+
 
 electron.crashReporter.start({
   productName: json.productName,
@@ -60,19 +63,29 @@ electron.crashReporter.start({
   submitURL: `${Config.REPORT_URL}/post`,
   autoSubmit: true
 })
+
+// console.log(app)
+console.log(app.getPath('userData'))
+
+// var addon = require('RongIMLib')
+// addon.initWithAppkey("n19jmcy59f1q9");
 // Only support Windows and OSX
-if ((platform.Windows || platform.OSX) && process.argv.indexOf('--disable-native') === -1) {
+
+/*if ((platform.Windows || platform.OSX) && process.argv.indexOf('--disable-native') === -1) {
     if (platform.OSX) {
       myScreen = require('nodobjc')
-      var modulePath = app.getName() == 'Electron' ? './node_modules/screenshot.framework' : app.getAppPath() + '.unpacked/node_modules/screenshot.framework'
-      // modulePath = './node_modules/screenshot.framework'
+      // 以下当asar为true时用
+      // var modulePath = app.getName() == 'Electron' ? './node_modules/screenshot.framework' : app.getAppPath() + '.unpacked/node_modules/screenshot.framework'
+      // 以下当asar为false时用
+      var modulePath = app.getName() == 'Electron' ? './node_modules/screenshot.framework' : app.getAppPath() + '/node_modules/screenshot.framework'
+
       myScreen.import(modulePath);
     }
 
     if (platform.Windows) {
       myScreen = require('screenshot')
     }
-}
+}*/
 
 if (platform.Windows) {
   app.setAppUserModelId('im.sealtalk.SealTalk.SealTalk')
@@ -113,15 +126,27 @@ app.on('ready', () => {
       titleBarStyle: 'hidden',
       icon: path.join(__dirname, 'res', 'app.png'),
       title: app.getName(),
+      show: false,
       'webPreferences': {
         preload: path.join(__dirname, 'js', 'preload.js'),
         nodeIntegration: false,
-        // webSecurity: false,
+        allowDisplayingInsecureContent: true,
+        // webSecurity: true,
         plugins: true
       }
     })
 
-  mainWindow.loadURL(Config.APP_ONLINE)
+    // mainWindow.once('ready-to-show', () => {
+    //   mainWindow.show()
+    // })
+
+  mainWindow.loadURL(Config.APP_ONLINE + '?r=' + Math.random())
+// mainWindow.loadURL('http://wslmac.58.com:9028/index.html?r=' + Math.random())
+
+  // mainWindow.loadURL("file://" + path.join(__dirname, 'index.html'));
+  // mainWindow.loadURL(Config.APP_ONLINE, {"extraHeaders" : "pragma: no-cache\n"})
+  // mainWindow.loadURL("http://localhost:8010")
+  // mainWindow.loadURL(Config.APP_ONLINE + '?r=' + Math.random())
 
   // Hide window when the window will be closed otherwise quit app.
   mainWindow.on('close', (event) => {
@@ -141,6 +166,9 @@ app.on('ready', () => {
       }
       if(platform.Windows && myScreen){
         myScreen.exit_shot();
+      }
+      if(mainWindow){
+        mainWindow.webContents.send('lougout')
       }
     }
     // Save window bounds info when closing.
@@ -206,11 +234,27 @@ app.on('ready', () => {
       takeScreenshot()
   })
 
-  ipcMain.on('displayBalloon', (event, title, message) => {
-    displayBalloon(title, message)
+  ipcMain.on('displayBalloon', (event, title, options) => {
+    displayBalloon(title, options.body)
+    tray.on('balloon-click', () => {
+      if (mainWindow) {
+         mainWindow.show()
+         mainWindow.webContents.send('balloon-click', opt)
+      }
+    })
   })
 
   const webContents = mainWindow.webContents
+
+  webContents.on('did-finish-load', function() {
+    mainWindow.show();
+  });
+  //
+  webContents.on('did-fail-load', function() {
+    // console.log('>>>>>>>>>>>>>>>>>>>page failed');
+    // mainWindow.loadURL(Config.APP_ONLINE)
+    //reload();
+  });
 
   webContents.on('new-window', (event, url) => {
     event.preventDefault()
@@ -227,7 +271,7 @@ app.on('ready', () => {
     webContents.insertCSS(fs.readFileSync(path.join(__dirname, 'res', 'browser.css'), 'utf8'))
     webContents.executeJavaScript(fs.readFileSync(path.join(__dirname, 'js', 'postload.js'), 'utf8'))
 
-    if (!UpdateController || updateManager) return
+/*    if (!UpdateController || updateManager) return
     updateManager = new UpdateController(app.getVersion())
 
     // Show dialog to install
@@ -251,7 +295,7 @@ app.on('ready', () => {
       if (platform.Windows) {
         displayBalloon('自动更新中...', state)
       }
-   })
+   })*/
 
   })
 
@@ -293,19 +337,20 @@ app.on('menu.edit.reload', () => {
 
 // Open homepage on homeplage menu item selected.
 app.on('menu.help.homepage', () => {
-  shell.openExternal('http://sealtalk.im')
+  shell.openExternal('http://hitalk.im')
 })
 
 
-app.on('menu.checkUpdate', function () {
-  if (!updateManager) return
-  if(updateManager.state == "downloading"){
-    Utils.showMessage('info', '正在更新', '正在更新', "当前更新状态: 正在下载中")
-    return
-  }
-  if (updateManager.state !== 'idle' && updateManager.state !== 'no-update-available') return
-  updateManager.check()
-})
+// 自动更新
+// app.on('menu.checkUpdate', function () {
+//   if (!updateManager) return
+//   if(updateManager.state == "downloading"){
+//     Utils.showMessage('info', '正在更新', '正在更新', "当前更新状态: 正在下载中")
+//     return
+//   }
+//   if (updateManager.state !== 'idle' && updateManager.state !== 'no-update-available') return
+//   updateManager.check()
+// })
 
 app.on('menu.edit.takeScreenshot', function () {
   takeScreenshot()
@@ -394,6 +439,13 @@ function initTray () {
        mainWindow.show()
     }
   })
+
+  // tray.on('balloon-click', () => {
+  //   if (mainWindow) {
+  //      mainWindow.show()
+  //      mainWindow.webContents.send('balloon-click')
+  //   }
+  // })
 
   if (platform.Windows) {
     const contextMenu = Menu.buildFromTemplate([
@@ -490,6 +542,13 @@ function displayBalloon(title, msg) {
       content: msg
   }
   tray.displayBalloon(options)
+  tray.on('balloon-click', (opt) => {
+    if (mainWindow) {
+       mainWindow.show()
+       mainWindow.webContents.send('balloon-click', opt)
+    }
+  })
+
 }
 
 process.on('uncaughtException', function (error) {

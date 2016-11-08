@@ -17,7 +17,7 @@ Because we use npm to maintain our third party libraries, you have to make sure 
 
 ```
   npm install
-  npm start
+  electron main.js --disable-native  或者   npm start
 ```
 - 特别说明
 

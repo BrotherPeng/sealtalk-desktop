@@ -12,6 +12,7 @@ const json = require('./package.json')
 const dialog = electron.dialog
 const iconPath = path.resolve(__dirname, './res/app.png')
 exports.handleError = function (error, extra, isShowError) {
+   console.log('err', error, extra);
   // if (typeof extra === "boolean") {
   //   isShowError = extra
   //   extra = {}

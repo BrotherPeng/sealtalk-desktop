@@ -25,7 +25,7 @@ const zip = require('gulp-zip');
 
 gulp.task('zip', () => {
   var fileName = 'SealTalk-' + packageJSON.version + '-darwin-x64.zip';
-	return gulp.src('build/SealTalk-darwin-x64/SealTalk.app')
+	return gulp.src('build/SealTalk-Ent-darwin-x64/SealTalk_Ent.app')
 		.pipe(zip(fileName))
 		.pipe(gulp.dest('dist/osx'));
 });
@@ -45,6 +45,40 @@ gulp.task('cleanup:build', function() {
     .pipe(clean());
 });
 
+// gulp.task('test', function(done) {
+//   builder({
+//     'appPath': 'build/SealTalk-darwin-x64/SealTalk.app',
+//     'platform': 'osx',
+//     'out': 'dist/osx',
+//     'overwrite': true,
+//     'config': {
+//       "osx" : {
+//         "title": "SealTalk",
+//         "background": "res/bg.png",
+//         "icon": "res/app.icns",
+//         "icon-size": 80,
+//         "title": "SealTalk_by_RongCloud_1_0_2",
+//         "contents": [
+//           { "x": 438, "y": 160, "type": "link", "path": "/Applications" },
+//           { "x": 192, "y": 160, "type": "file" }
+//         ]
+//       }
+//     }
+//   }, function(error, appPaths) {
+//     if (error) {
+//       console.log(error);
+//       process.exit(1);
+//     }
+//     else {
+//       // TODO
+//       // we should support to build all platforms at once later !
+//       // something like [ 'build/Kaku-darwin-x64' ]
+//       finalAppPaths = appPaths;
+//       done();
+//     }
+//   });
+// });
+
 gulp.task('package', function(done) {
   var devDependencies = packageJSON.devDependencies;
   var devDependenciesKeys = Object.keys(devDependencies);
@@ -57,7 +91,10 @@ gulp.task('package', function(done) {
     'gulpfile.js',
     'builder.json',
     'gruntfile.js',
-    '.npminstall'
+    '.npminstall',
+    'index.html',
+    'index1.html',
+    'app.js'
   ];
 
   devDependenciesKeys.forEach(function(key) {
@@ -82,14 +119,16 @@ gulp.task('package', function(done) {
 
   var ignorePath = ignoreFiles.join('|');
   var ignoreRegexp = new RegExp(ignorePath, 'ig');
+  // var unpackRegexp = new RegExp(['screenshot.framework','RongIMLib.node'], 'ig');
+  // var unpackRegexp = new RegExp(['*.node'], 'ig');
 
   packager({
     'dir': './',
     'name': packageJSON.productName,
     'platform': platform,
-    'asar': true,
-    // 'asar-unpack': './node_modules/screenshot.framework/**',
-    'asar-unpack-dir': 'node_modules/screenshot.framework',
+    'asar': false,
+    // 'asar-unpack': 'RongIMLib.node',
+    // 'asar-unpack-dir': 'node_modules/screenshot.framework',
     'arch': arch,
     'version': packageJSON.package.runtimeVersion,
     'out': './build',
@@ -97,13 +136,28 @@ gulp.task('package', function(done) {
     'app-bundle-id': 'com.RCloud.SealTalk',   // OS X only
     'app-version': packageJSON.version,
     'build-version': packageJSON.version,
-    'helper-bundle-id': 'SealTalk',// OS X only
+    'helper-bundle-id': 'SealTalk_Ent',// OS X only
     'ignore': ignoreRegexp,
     'overwrite': true,
+    // 'prune': true,
     'app-copyright': packageJSON.copyright,
+    // 'osx-sign': true,
+    // 'osx-sign': {
+    //   'identity': 'Developer ID Application: Beijing Rong Cloud Network Technology CO., LTD (CQJSB93Y3D)',
+    //   'entitlements': 'build/SealTalk-darwin-x64/SealTalk.app'
+    //  },
+    // 'all': true,
+    
+    'protocols': [{
+        name: 'sealtalk',
+        schemes: ['sealtalk']
+    }],
     'version-string': {
       'CompanyName': packageJSON.author,
       'FileDescription': packageJSON.description,
+      // 'LegalCopyright': packageJSON.license,
+      // 'FileVersion': packageJSON.version,
+      // 'ProductVersion': packageJSON.version,
       'OriginalFilename': 'atom.exe',
       'ProductName': packageJSON.productName,
       'InternalName': packageJSON.productName
@@ -156,6 +210,9 @@ gulp.task('build', function(callback) {
     'package',
     'post-package'
   ];
+  // if(osInfo.platform == 'darwin'){
+  //   tasks.push('zip')
+  // }
 
   sequence(
     tasks

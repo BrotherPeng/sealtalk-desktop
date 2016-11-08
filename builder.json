@@ -1,10 +1,10 @@
 {
   "osx" : {
-    "title": "SealTalk",
+    "title": "SealTalk_Ent",
     "background": "res/bg.png",
     "icon": "res/app.icns",
     "icon-size": 80,
-    "title": "SealTalk_by_RongCloud_1_0_2",
+    "title": "SealTalk_Ent_by_RongCloud",
     "contents": [
       { "x": 438, "y": 160, "type": "link", "path": "/Applications" },
       { "x": 192, "y": 160, "type": "file" }
