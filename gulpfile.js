@@ -94,7 +94,10 @@ gulp.task('package', function(done) {
     '.npminstall',
     'index.html',
     'index1.html',
-    'app.js'
+    'app.js',
+    'desktop_setup.iss',
+    'setup_info_before.txt',
+    'setup_info_after.txt'
   ];
 
   devDependenciesKeys.forEach(function(key) {

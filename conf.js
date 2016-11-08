@@ -1,12 +1,13 @@
-
-var ONLINE = 'sealtalk'
-var config = {
-  REPORT_URL: 'http://report.' + ONLINE + '.im',
-  API_URL_MAC: 'http://api.' + ONLINE + '.im',
-  API_URL_WIN: 'http://downloads.rongcloud.cn',
-  //APP_ONLINE: 'http://web.' + ONLINE + '.im/',
-  APP_ONLINE: 'http://120.92.22.196:80/',
+var sealtalk_config = {
+  REPORT_URL: 'http://report.sealtalk.im',  //crash report 地址
+  APP_ONLINE: 'http://web.sealtalk.im/',   // im 地址
   DEBUG: false
 }
 
-module.exports = config
+var hitalk_config = {
+  REPORT_URL: 'http://report.hitalk.im',  //crash report 地址
+  APP_ONLINE: 'http://web.hitalk.im/',   // im 地址
+  DEBUG: false
+}
+
+module.exports = sealtalk_config
