@@ -7,16 +7,35 @@ const platform = {
   Windows: process.platform === 'win32'
 }
 var appInfo
+var RongIMClientC
+// var configInfo
 
 try {
   appInfo = remote.require('./package.json')
 } catch (err) {
   appInfo = null
 }
-
+try {
+    RongIMClientC = remote.require('RongIMLib')
+} catch (err) {
+    console.log(err);
+    RongIMClientC = null
+}
+// try {
+//     configInfo = remote.require('../conf.js')
+//     console.log('configInfo', configInfo)
+// } catch (err) {
+//     configInfo = null
+// }
 window.Electron = {
   ipcRenderer: ipcRenderer,
   appInfo: appInfo,
+
+  configInfo: configInfo,
+  require: require,
+  remote: remote,
+  addon: RongIMClientC,
+
   updateBadgeNumber: function (number) {
     // console.log('updateBadgeNumber')
     this.ipcRenderer.send('unread-message-count-changed', number)

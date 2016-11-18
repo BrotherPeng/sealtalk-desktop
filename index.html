@@ -1,42 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="webim">
   <head>
-    <title>Hello World!</title>
-    <script>
-      if (Electron && Electron.ipcRenderer) Electron.ipcRenderer.send('new-message', 1);
-      function notifyMe() {
-        // Let's check if the browser supports notifications
-        if (!("Notification" in window)) {
-          alert("This browser does not support desktop notification");
-        }
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <title>SealTalk</title>
 
-        // Let's check whether notification permissions have already been granted
-        else if (Notification.permission === "granted") {
-          // If it's okay let's create a notification
-          var notification = new Notification("Hi there!");
-        }
-
-        // Otherwise, we need to ask the user for permission
-        else if (Notification.permission !== 'denied') {
-          Notification.requestPermission(function (permission) {
-            // If the user accepts, let's create a notification
-            if (permission === "granted") {
-              var notification = new Notification("Hi there!");
-            }
-          });
-        }
-
-        // At last, if the user has denied notifications, and you
-        // want to be respectful there is no need to bother them any more.
-      }
-    </script>
+    <link rel="shortcut icon" href="assets/img/SealTalk.ico"/>
+    <link rel="stylesheet" href="assets/css/main.css" charset="utf-8">
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-    <a href="http://baidu.com" target="_blank">aaa</a>
-    <button onclick="notifyMe()">Notify me!</button>
+    <div ui-view>
+
+    </div>
+    <script>
+      window.__sealtalk_config={
+        // serverUrl:"http://api.hitalk.im",
+        // appkey:"e0x9wycfx7flq",
+        // online:false
+//        serverUrl:"http://api.sealtalk.im",
+//          serverUrl:"http://localhost/sgai/i3/rongcloud",
+//          authUrl:"http://localhost/sgai/i3",
+          serverUrl:"http://www.ishangban.com/sgai/i3/rongcloud",
+          authUrl:"http://www.ishangban.com/sgai/i3",
+//        appkey:"n19jmcy59f1q9",
+        appkey:"tdrvipksrbsg5",
+        online:true
+      }
+    </script>
+    <!-- <script src="http://cdn.ronghub.com/RongIMLib-2.2.3.min.js"></script> -->
+    <script src="assets/js/RongIMLib.js"></script>
+    <script src="assets/js/RongUploadLib.js"></script>
+    <!-- <script src="http://cdn.ronghub.com/RongUploadLib-2.2.2.min.js"></script> -->
+
+    <script src="http://cdn.ronghub.com/RongEmoji-2.2.2.min.js"></script>
+
+    <script src="http://cdn.ronghub.com/RongIMVoice-2.1.0.min.js"></script>
+
+    <script src="http://cdn.ronghub.com/jquery.min.js"></script>
+
+    <script src="assets/js/angular.min.js"></script>
+    <script src="assets/js/angular-widget.min.js"></script>
+
+    <script src="assets/js/other.min.js"></script>
+
+    <script src="assets/js/main.min.js"></script>
+
   </body>
 </html>

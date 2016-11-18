@@ -122,6 +122,7 @@ app.on('ready', () => {
     })
 
   mainWindow.loadURL(Config.APP_ONLINE)
+  // mainWindow.loadURL('file://' + __dirname + '/index.html'); //使用本地文件
 
   // Hide window when the window will be closed otherwise quit app.
   mainWindow.on('close', (event) => {
@@ -232,7 +233,7 @@ app.on('ready', () => {
 
     // Show dialog to install
     updateManager.on('update-downloaded', function (releaseInfo) {
-      let ret = dialog.showMessageBox(mainWindow, {
+      /*let ret = dialog.showMessageBox(mainWindow, {
         type: 'info',
         buttons: ['取消', '安装并重启'],
         icon: path.join(__dirname, 'res/app.png'),
@@ -244,13 +245,13 @@ app.on('ready', () => {
         // isManualClose = true
         forceQuit = true
         updateManager.install()
-      }
+      }*/
     })
 
     updateManager.on('state-changed', function (state) {
-      if (platform.Windows) {
+      /*if (platform.Windows) {
         displayBalloon('自动更新中...', state)
-      }
+      }*/
    })
 
   })
@@ -404,12 +405,12 @@ function initTray () {
             mainWindow.show()
           }
         }
-      }, {
+      }, /*{
         label: app.__('winTrayMenus.CheckUpdate'),
         click () {
           app.emit('menu.checkUpdate')
         }
-      }, {
+      },*/ {
         type: 'separator'
       }, {
         label: app.__('winTrayMenus.Exit'),
