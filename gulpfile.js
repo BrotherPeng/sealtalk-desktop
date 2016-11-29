@@ -224,7 +224,8 @@ gulp.task('build', function(callback) {
 
 gulp.task('createWindowsInstaller', function(done) {
   var osInfo = getOSInfo();
-  var appDirectory = './build/SealTalk-win32-' + osInfo.arch;
+  var appDirectory = './build/SealTalk_Ent-win32-' + osInfo.arch;
+
   var outputDirectory = './dist/installer_' + osInfo.arch;
   var resultPromise = electronInstaller.createWindowsInstaller({
       appDirectory: appDirectory,
@@ -232,11 +233,12 @@ gulp.task('createWindowsInstaller', function(done) {
       authors: packageJSON.author,
       exe: packageJSON.productName + '.exe',
       setupIcon: './res/app.ico',
-      setupExe: ' SealTalk_by_RongCloud_' + packageJSON.version + '.exe',
+      setupExe: 'SealTalk_by_RongCloud_' + packageJSON.version + '.exe',
       noMsi: 'true',
       iconUrl: 'http://7i7gc6.com1.z0.glb.clouddn.com/image/sealtalk.ico',
       loadingGif: './res/loading.gif'
   });
+    console.log(appDirectory);
   resultPromise.then(() => console.log("It worked!"), (e) => console.log(`No dice: ${e.message}`));
 });
 
